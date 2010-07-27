@@ -289,7 +289,12 @@ module Buildr
           if @publish_options_calc
             @publish_options ||= @publish_options_calc.call(self)
           else
-            @publish_options ||= Ivy.setting('publish.options') || {}
+            def symbolize(map)
+              m = {}
+              map.each_pair { |k, v| m[k.to_sym] = v } if map
+              m
+            end
+            @publish_options ||= symbolize(Ivy.setting('publish.options'))
           end
         else
           raise "Could not set 'publish_options' for '#{@project.name}' without own ivy file!" unless own_file?
