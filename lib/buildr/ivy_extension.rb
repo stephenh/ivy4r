@@ -151,6 +151,21 @@ module Buildr
           end
         end
       end
+
+      def makepom
+        def symbolize(map)
+          m = {}
+          map.each_pair { |k,v| m[k.to_sym] = v } if map
+          m
+        end
+        base_options = {
+          :ivyfile => file,
+          :pomfile => project._(:target, "#{manifest['module']}-#{manifest['revision']}.pom"),
+          :nested => {},
+        }
+        options = symbolize(Ivy.setting('makepom.options')) * base_options
+        ivy4r.makepom options
+      end
       
       # Resolves the configured file once.
       def __resolve__
@@ -676,6 +691,9 @@ module IvyExtension
       
       desc 'Publish the artifacts to ivy repository as defined by environment'
       task :publish
+
+      desc 'Create a pom from the local ivy file'
+      task :makepom
       
       desc 'Creates a dependency report for the project'
       task :report
@@ -738,6 +756,10 @@ module IvyExtension
         task :publish => "#{project.name}:ivy:resolve" do
           project.ivy.__publish__
         end
+
+        task :makepom do
+          project.ivy.makepom
+        end
       end
     end
   end
@@ -780,6 +802,13 @@ namespace 'ivy' do
     info "Publishing all distinct ivy files"
     Buildr.projects.find_all{ |p| p.ivy.own_file? }.each do |project|
       project.task('ivy:publish').invoke
+    end
+  end
+
+  task :makepom do
+    info "Making poms for all distinct ivy files"
+    Buildr.projects.find_all{ |p| p.ivy.own_file? }.each do |project|
+      project.task('ivy:makepom').invoke
     end
   end
 end
