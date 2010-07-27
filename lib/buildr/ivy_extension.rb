@@ -170,6 +170,7 @@ module Buildr
         if @base_ivy
           @base_ivy.manifest
         else
+          __resolve__
           {
             'organisation' => @resolved['ivy.organisation'],
             'module' => @resolved['ivy.module'],
