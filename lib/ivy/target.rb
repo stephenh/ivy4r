@@ -90,6 +90,8 @@ module Ivy
     def call_nested(nested)
       if nested
         nested.each do |method, paramlist|
+          # For passing multiple nested elements, e.g. mapping_1, mapping_2
+          method = method.to_s.gsub(/_[0-9]+$/, '').to_sym
           [paramlist].flatten.each do |params|
             if params.member? :nested
               p = params.dup
