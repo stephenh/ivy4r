@@ -37,7 +37,7 @@ module Buildr
         @project = project
         @post_resolve_task_list = []
         @extension_dir = project.parent.nil? ? @project.base_dir : @project.parent.ivy.extension_dir
-        @base_ivy = @project.parent.ivy unless own_file? 
+        @base_ivy = @project.parent.ivy unless own_file? or @project.parent.nil?
         @target_config = Hash.new do
           |hash, key| hash[key] = {}
         end
@@ -46,7 +46,7 @@ module Buildr
       
       def enabled?
         setting = Ivy.setting('enabled')
-        @enabled ||= setting.nil? ? true : setting
+        @enabled ||= setting.nil? ? own_file? : setting
       end
       
       def own_file?
